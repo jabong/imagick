@@ -1565,14 +1565,15 @@ func (mw *MagickWand) ModulateImage(brightness, saturation, hue float64) error {
 // frame: Surround the image with an ornamental border (e.g. 15x15+3+3). The
 // frame color is that of the thumbnail's matte color.
 //
-func (mw *MagickWand) MontageImage(dw *DrawingWand, tileGeo string, thumbGeo string, mode MontageMode, frame string) *MagickWand {
+func (mw *MagickWand) MontageImage(dw *DrawingWand, tileGeo string, thumbGeo string, mode MontageMode, frame string) (*MagickWand, error) {
 	cstile := C.CString(tileGeo)
 	defer C.free(unsafe.Pointer(cstile))
 	csthumb := C.CString(thumbGeo)
 	defer C.free(unsafe.Pointer(csthumb))
 	csframe := C.CString(frame)
 	defer C.free(unsafe.Pointer(csframe))
-	return &MagickWand{C.MagickMontageImage(mw.mw, dw.dw, cstile, csthumb, C.MontageMode(mode), csframe)}
+	cmw := &MagickWand{C.MagickMontageImage(mw.mw, dw.dw, cstile, csthumb, C.MontageMode(mode), csframe)}
+	return cmw, mw.GetLastError()
 }
 
 // Method morphs a set of images. Both the image pixels and size are linearly
